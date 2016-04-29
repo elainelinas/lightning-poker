@@ -1,7 +1,8 @@
+require 'set'
 require 'card'
 
 describe Card do
-
+      
   def card(params = {})
     defaults = {
       suit: :hearts,
@@ -19,25 +20,52 @@ describe Card do
     raise unless card(rank: 4).rank == 4
   end
 
-  it 'is equal to itself' do
-    subject = card(suit: :spades, rank: 4)
-    other   = card(suit: :spades, rank: 4)
+  context 'equality' do
+    def subject
+      @subject ||= card(suit: :spades, rank: 4)
+    end
 
-    raise unless subject == other
-  end
+    describe 'comparing against self' do
+     def other
+       @other ||= card(suit: :spades, rank: 4)
+     end
 
-  it 'is not equal to a card of differing suit' do
-    subject = card(suit: :spades, rank: 4)
-    other = card(suit: :hearts, rank: 4)
+     it 'is equal' do
+       raise unless subject == other
+     end	
+  
+     it 'is hash equal' do
+       raise unless Set.new([subject, other]).size == 1
+     end
+    end
+  
+    describe 'comparing a card of different suit' do
+      def other
+        @other ||= card(suit: :hearts, rank: 4)
+      end
 
-    raise unless subject != other
-  end
+      it 'is not equal' do
+        raise unless subject != other
+      end
+    
+      it 'is not hash equal' do
+        raise unless Set.new([subject, other]).size == 2
+      end
+    end
+  
+    describe 'comparing to a card of a different rank' do
+      def other
+        @other ||= card(suit: :spades, rank: 5)
+      end
 
-  it 'is not equal to a card of differing rank' do
-    subject = card(suit: :spades, rank: 4)
-    other   = card(suit: :spades, rank: 5)
-
-    raise unless subject != other
+      it 'is not equal' do
+        raise unless subject != other
+      end
+    
+      it 'is not hash equal' do
+        raise unless Set.new([subject, other]).size == 2
+      end
+    end
   end
 
   describe 'a jack' do
